@@ -88,6 +88,7 @@
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-json": "3.1.0",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "eslint-plugin-xwalk": "github:adobe-rnd/eslint-plugin-xwalk",
     "husky": "9.1.1",
     "merge-json-cli": "1.0.4",
@@ -96,6 +97,9 @@
     "stylelint-config-standard": "40.0.0"
 =======
     "eslint-plugin-xwalk": "github:adobe-rnd/eslint-plugin-xwalk#v0.1.3",
+=======
+    "eslint-plugin-xwalk": "git+https://github.com/adobe-rnd/eslint-plugin-xwalk.git#v0.1.3",
+>>>>>>> 3e88807 (Updated package.json)
     "fs-extra": "11.2.0",
     "husky": "9.1.1",
     "jsdom": "24.0.0",
