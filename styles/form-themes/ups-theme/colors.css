@@ -1,0 +1,22 @@
+/* Color and theming tokens (root-level foundation) */
+:root {
+    --ups-color-bg: #fff;
+    --ups-color-surface: #fff;
+    --ups-color-surface-muted: #f6f6f6;
+    --ups-color-text-primary: #300;
+    --ups-color-text-secondary: #474747;
+    --ups-color-border: #e0dcdb;
+    --ups-color-border-strong: #bebebe;
+    --ups-color-brand: #00857d;
+    --ups-color-brand-hover: #016862;
+    --ups-color-error: #e51b00;
+    --ups-color-error-text: #e51b00;
+    --ups-color-success: #0f5132;
+    --ups-color-success-bg: #d1e7dd;
+    --ups-color-success-border: #badbcc;
+    --ups-color-success-text: #0f5132;
+    --ups-color-error-bg: #fdecec;
+    --ups-color-error-border: #f5c2c7;
+    --ups-color-text-on-brand: #fff;
+    --ups-color-error-text: #f3f3f3
+}

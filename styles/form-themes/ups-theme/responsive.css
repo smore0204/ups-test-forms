@@ -1,0 +1,41 @@
+/* Responsive ranges */
+@media (width <= 599px) {
+    :root {
+        --ups-layout-padding-inline: 12px;
+        --ups-layout-padding-bottom: 18px;
+        --ups-layout-field-gap-x: 10px;
+        --ups-layout-field-gap-y: 16px;
+        --ups-layout-control-height: 36px;
+        --ups-font-size-submit: 24px;
+    }
+
+    .form :where(.button-wrapper button,
+button[type='submit']) {
+        width: 100%;
+        max-width: none;
+    }
+
+    .form .panel-wrapper {
+        padding: 10px;
+    }
+}
+
+@media (width >= 600px) and (width <= 1023px) {
+    :root {
+        --ups-layout-field-gap-x: 20px;
+        --ups-layout-field-gap-y: 18px;
+    }
+}
+
+@media (width >= 1440px) {
+    :root {
+        --ups-layout-max-width: 860px;
+    }
+}
+
+@media (width >= 500px) {
+    .form :where(.button-wrapper button,
+button[type='submit']) {
+        width: 250px;
+    }
+}

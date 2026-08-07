@@ -30,6 +30,39 @@
           "...": "../form-common/_basic-fields.json#/fields"
         },
         {
+          "component": "tab",
+          "label": "Style",
+          "name": "style"
+        },
+        {
+          "component": "text",
+          "name": "buttonBackgroundColor",
+          "label": "Button background color",
+          "valueType": "string",
+          "description": "Any valid CSS color. Example: #00857d"
+        },
+        {
+          "component": "select",
+          "name": "buttonAlignment",
+          "label": "Button alignment",
+          "valueType": "string",
+          "value": "left",
+          "options": [
+            {
+              "name": "Left",
+              "value": "left"
+            },
+            {
+              "name": "Center",
+              "value": "center"
+            },
+            {
+              "name": "Right",
+              "value": "right"
+            }
+          ]
+        },
+        {
           "...": "../form-common/_help-container.json#/fields"
         }
       ]

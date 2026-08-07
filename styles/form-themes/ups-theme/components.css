@@ -1,0 +1,132 @@
+/* Component-specific styling using wrapper patterns ({Type}-wrapper) */
+
+/* Field wrapper positioning for error message tooltips */
+.form .field-wrapper {
+    position: relative;
+}
+
+/* Generic text-like wrappers */
+.form :where(.text-wrapper,
+    .text-input-wrapper,
+    .number-wrapper,
+    .number-input-wrapper,
+    .email-wrapper,
+    .date-wrapper,
+    .date-input-wrapper,
+    .telephone-wrapper,
+    .telephone-input-wrapper,
+    .password-wrapper,
+    .multiline-wrapper,
+    .drop-down-wrapper) {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Control elements */
+.form :where(input, textarea, select) {
+    background-color: var(--ups-color-surface-muted);
+}
+
+
+/* Labels and help text */
+.form :where(label, fieldset.checkbox-group-wrapper legend,
+fieldset.radio-group-wrapper legend) {
+    color: var(--ups-color-text-primary);
+    font-size: var(--ups-font-size-label);
+    font-weight: var(--ups-font-weight-label);
+}
+
+.form .field-description {
+    font-size: var(--ups-font-size-help);
+    color: var(--ups-color-text-primary);
+}
+
+
+/* Button */
+.form .button-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    width: fit-content;
+}
+
+.form .button-wrapper.button-align-center {
+    justify-content: center;
+    width: 100%;
+}
+
+.form .button-wrapper.button-align-right {
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.form :where(.button-wrapper button,
+button[type='submit']) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    border-radius: var(--ups-radius-control);
+    background: var(--ups-color-brand);
+    color: var(--ups-color-text-on-brand);
+    font-size: var(--ups-font-size-submit);
+    font-family: "UPS Berlingske Sans Bold", "UPS Berlingske Sans", Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    line-height: 1.1;
+    padding: 15px 30px;
+    border: 0;
+    overflow-wrap: break-word;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Button Variations */
+
+/* Primary - UPS Brand Teal (default) - #00857d with white text */
+.form .button-wrapper button[data-variation='primary'],
+.form .button-wrapper button:not([data-variation]),
+.form .button-wrapper button {
+    background: var(--ups-color-brand);
+    color: var(--ups-color-text-on-brand);
+    border: 0;
+}
+
+.form .button-wrapper button[data-variation='primary']:hover,
+.form .button-wrapper button:not([data-variation]):hover,
+.form .button-wrapper button:hover {
+    background: var(--ups-color-brand-hover);
+}
+
+/* Secondary - Dark Gray */
+.form .button-wrapper button[data-variation='secondary'] {
+    background: var(--ups-color-text-secondary);
+    color: var(--ups-color-text-on-brand);
+    border: 0;
+}
+
+.form .button-wrapper button[data-variation='secondary']:hover {
+    background: var(--ups-color-text-primary);
+}
+
+/* Outlined - Transparent with Teal border */
+.form .button-wrapper button[data-variation='outlined'] {
+    background: transparent;
+    color: var(--ups-color-brand);
+    border: 2px solid var(--ups-color-brand);
+}
+
+.form .button-wrapper button[data-variation='outlined']:hover {
+    background: var(--ups-color-brand);
+    color: var(--ups-color-text-on-brand);
+}
+
+/* UPS - Teal Button */
+.form .button-wrapper button[data-variation='ups'] {
+    background: var(--ups-color-brand);
+    color: var(--ups-color-text-on-brand);
+    border: 0;
+    font-weight: 700;
+}
+
+.form .button-wrapper button[data-variation='ups']:hover {
+    background: var(--ups-color-brand-hover);
+}

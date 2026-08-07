@@ -1,0 +1,18 @@
+/* Spacing, radius, and layout tokens (root-level foundation) */
+:root {
+    --ups-space-1: 4px;
+    --ups-space-2: 8px;
+    --ups-space-3: 12px;
+    --ups-space-4: 16px;
+    --ups-space-5: 20px;
+    --ups-space-6: 24px;
+    --ups-radius-control: 8px;
+    --ups-radius-container: 12px;
+    --ups-layout-max-width: 860px;
+    --ups-layout-padding-inline: 15px;
+    --ups-layout-padding-bottom: 24px;
+    --ups-layout-field-gap-x: 40px;
+    --ups-layout-field-gap-y: 20px;
+    --ups-layout-control-height: 40px;
+    --ups-focus-ring: none;
+}

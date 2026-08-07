@@ -47,6 +47,7 @@
       "captcha",
       "checkbox",
       "checkbox-group",
+      "form-header",
       "date-input",
       "drop-down",
       "email",

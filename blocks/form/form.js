@@ -309,12 +309,25 @@ export async function generateFormRendition(panel, container, formId, getItems =
 function enableValidation(form) {
   form.querySelectorAll('input,textarea,select').forEach((input) => {
     input.addEventListener('invalid', (event) => {
+      event.preventDefault();
       checkValidation(event.target);
     });
   });
 
   form.addEventListener('change', (event) => {
     checkValidation(event.target);
+  });
+
+  // Show error message when user focuses out of any input field
+  form.addEventListener('focusout', (event) => {
+    const input = event.target;
+    if (input.matches('input, textarea, select')) {
+      const fieldWrapper = input.closest('.field-wrapper');
+      if (fieldWrapper) {
+        fieldWrapper.dataset.userInteracted = 'true';
+      }
+      checkValidation(input);
+    }
   });
 }
 
@@ -360,10 +373,9 @@ export async function createForm(formDef, data, source = 'aem') {
     captcha.loadCaptcha(form);
   }
 
-  // Only enable DOM validation for doc-based forms; edge forms use the model.
-  if (source === 'sheet') {
-    enableValidation(form);
-  }
+  // Enable validation for all forms (doc-based and AEM edge forms)
+  enableValidation(form);
+  
   transferRepeatableDOM(form, formDef, form, formId);
 
   if (afModule && typeof Worker === 'undefined') {
@@ -550,6 +562,35 @@ async function setupForm(formDef, { pathname, block, editMode = false } = {}) {
     form.dataset.rules = true;
     if (def.properties && def.properties['fd:path']) {
       form.dataset.formpath = def.properties['fd:path'];
+    }
+  }
+
+  const formProperties = def?.properties || {};
+  const appendCssDeclaration = (css, key, value) => {
+    if (!value) return css;
+    const prefix = css && !css.trim().endsWith(';') ? `${css}; ` : (css || '');
+    return `${prefix}${key}: ${value};`;
+  };
+  if (formProperties.id) {
+    form.id = formProperties.id;
+  }
+  if (formProperties.class) {
+    formProperties.class.split(/\s+/).filter(Boolean).forEach((cls) => form.classList.add(cls));
+  }
+  let formCss = formProperties.css;
+  formCss = appendCssDeclaration(formCss, 'padding', formProperties.padding);
+  formCss = appendCssDeclaration(formCss, 'margin', formProperties.margin);
+  formCss = appendCssDeclaration(formCss, 'border', formProperties.border);
+  formCss = appendCssDeclaration(formCss, 'border-radius', formProperties.borderRadius || formProperties.radius);
+  if (formCss) {
+    form.style.cssText = formCss;
+    const formPaddingLeft = form.style.paddingLeft || form.style.paddingInlineStart;
+    const formPaddingRight = form.style.paddingRight || form.style.paddingInlineEnd;
+    if (formPaddingLeft) {
+      form.style.setProperty('--form-inline-padding-left', formPaddingLeft);
+    }
+    if (formPaddingRight) {
+      form.style.setProperty('--form-inline-padding-right', formPaddingRight);
     }
   }
 

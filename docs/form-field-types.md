@@ -26,6 +26,17 @@ This document summarizes how JSON schema maps to rendered HTML in `blocks/form/f
 - `tooltip`: Used for the `title` attribute on inputs.
 - `constraintMessages`: Custom error messages (as data attributes).
 
+## Form-Level Responsive Classes
+- These classes are applied on the `<form>` element using form block config.
+- `stack-tablet`: Stacks all `col-*` field wrappers to full width on tablet/mobile (`<= 1024px`).
+- `stack-mobile`: Stacks all `col-*` field wrappers to full width only on mobile (`<= 599px`).
+- You can decide behavior per form by setting the `class` config row.
+
+**Example form block config rows:**
+- `class: stack-tablet`
+- `class: stack-mobile`
+- `class: stack-tablet custom-form-theme`
+
 ## Common HTML Structure
 Most fields are rendered inside a wrapper with a label and optional help text:
 
