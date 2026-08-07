@@ -1,0 +1,38 @@
+/*
+ * UPS Virtual Consultation Form - Variable Bridge
+ * Maps UPS design tokens to Adaptive Forms variables
+ * Focused on consultation form use case only
+ */
+
+.form {
+    /* Brand & Primary Colors */
+    --button-primary-color: var(--ups-color-brand);
+    --button-primary-hover-color: var(--ups-color-brand-hover);
+    --form-error-color: var(--ups-color-error);
+
+    /* Form Surfaces & Backgrounds */
+    --background-color-primary: var(--ups-color-bg);
+    --form-background-color: var(--ups-color-surface);
+    --form-input-background-color: var(--ups-color-surface-muted);
+
+    /* Borders & Dividers */
+    --border-color: var(--ups-color-border);
+    --form-input-border-color: var(--ups-color-border);
+    --form-invalid-border-color: var(--ups-color-error);
+
+    /* Typography */
+    --label-color: var(--ups-color-text-secondary);
+    --form-label-font-size: var(--ups-font-size-label);
+    --form-label-font-weight: var(--ups-font-weight-label);
+    --form-input-font-size: var(--ups-font-size-control);
+    --form-button-font-size: var(--ups-font-size-submit);
+
+    /* Spacing */
+    --form-padding: 0 var(--ups-layout-padding-inline);
+    --form-field-horz-gap: var(--ups-layout-field-gap-x);
+    --form-field-vert-gap: var(--ups-layout-field-gap-y);
+
+    /* Button Styling */
+    --form-button-background-color: var(--ups-color-brand);
+    --form-button-background-hover-color: var(--ups-color-brand-hover);
+}

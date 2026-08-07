@@ -1,4 +1,5 @@
 import { DEFAULT_THANK_YOU_MESSAGE, getSubmitBaseUrl } from './constant.js';
+import { checkValidation } from './util.js';
 
 export function submitSuccess(e, form) {
   const { payload } = e;
@@ -119,6 +120,7 @@ async function submitDocBasedForm(form, captcha) {
 
 export async function handleSubmit(e, form, captcha) {
   e.preventDefault();
+  form.dataset.validationAttempted = 'true';
 
   const valid = form.checkValidity();
   if (valid) {
@@ -134,6 +136,10 @@ export async function handleSubmit(e, form, captcha) {
       }
     }
   } else {
+    form.querySelectorAll(':invalid:not(fieldset)').forEach((invalidField) => {
+      checkValidation(invalidField);
+    });
+
     const firstInvalidEl = form.querySelector(':invalid:not(fieldset)');
     if (firstInvalidEl) {
       firstInvalidEl.focus();

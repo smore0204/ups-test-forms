@@ -1,0 +1,13 @@
+/*
+ * UPS theme entrypoint.
+ * Layers on top of blocks/form/form.css without removing base styles.
+ */
+
+@import url("./colors.css");
+@import url("./typography.css");
+@import url("./spacing-layout.css");
+@import url("./form-variable-bridge.css");
+@import url("./structure.css");
+@import url("./components.css");
+@import url("./states.css");
+@import url("./responsive.css");

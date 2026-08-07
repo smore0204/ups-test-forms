@@ -64,6 +64,23 @@ function handleActiveChild(id, form) {
   }
 }
 
+function shouldRenderValidationMessage(field) {
+  const parentForm = field?.form;
+  return field?.dataset?.userInteracted === 'true' || parentForm?.dataset?.validationAttempted === 'true';
+}
+
+function markFieldInteracted(field) {
+  if (!field || field.dataset.validationHandlersBound === 'true') {
+    return;
+  }
+  const setInteracted = () => {
+    field.dataset.userInteracted = 'true';
+  };
+  field.addEventListener('change', setInteracted);
+  field.addEventListener('blur', setInteracted);
+  field.dataset.validationHandlersBound = 'true';
+}
+
 export async function fieldChanged(payload, form, generateFormRendition) {
   const { changes, field: fieldModel } = payload;
   const {
@@ -86,6 +103,7 @@ export async function fieldChanged(payload, form, generateFormRendition) {
     return;
   }
   const fieldWrapper = field?.closest('.field-wrapper');
+  markFieldInteracted(field);
   changes.forEach((change) => {
     const { propertyName, currentValue, prevValue } = change;
     switch (propertyName) {
@@ -117,7 +135,9 @@ export async function fieldChanged(payload, form, generateFormRendition) {
           if (field.setCustomValidity) {
             if (currentValue && validity && validity.valid === false) {
               field.setCustomValidity(currentValue);
-              updateOrCreateInvalidMsg(field, currentValue);
+              if (shouldRenderValidationMessage(field)) {
+                updateOrCreateInvalidMsg(field, currentValue);
+              }
             } else if (!currentValue) {
               // Model says field is valid; clear DOM validation state
               // For file inputs, only clear if there's no custom validity already set
@@ -256,7 +276,9 @@ export async function fieldChanged(payload, form, generateFormRendition) {
           const validationMessage = fieldModel.validationMessage || fieldModel.errorMessage;
           if (validationMessage) {
             field?.setCustomValidity(validationMessage);
-            updateOrCreateInvalidMsg(field, validationMessage);
+            if (shouldRenderValidationMessage(field)) {
+              updateOrCreateInvalidMsg(field, validationMessage);
+            }
           }
         }
         break;

@@ -1,18 +1,20 @@
+@layer base, theme;
+
+@import url("../../styles/form-themes/ups-theme/ups-theme.css") layer(theme);
+
+@layer base {
 :root {
     --background-color-primary: #fff;
     --label-color: #666;
     --border-color: #818a91;
     --form-error-color: #ff5f3f;
-    --button-primary-color: #5F8DDA;
-    --button-secondary-color: #666;
-    --button-primary-hover-color: #035fe6;
     --form-font-size-m: 22px;
     --form-font-size-s: 18px;
     --form-font-size-xs: 16px;
     --form-background-color: var(--background-color-primary);
     --form-padding: 0 10px;
     --form-columns: 12;
-    --form-field-horz-gap: 40px;
+    --form-field-horz-gap: 10px;
     --form-field-vert-gap: 20px;
     --form-invalid-border-color: #ff5f3f;
     --form-input-padding: 0.75rem 0.6rem;
@@ -37,10 +39,10 @@
     --form-fieldset-legend-font-weight: var(--form-title-font-weight);
     --form-fieldset-legend-border: none;
     --form-fieldset-legend-padding: 0;
-    --form-button-color: var(--background-color-primary);
+    --form-button-color: #fff;
     --form-button-font-size: var(--form-font-size-s);
-    --form-button-background-color: var(--button-primary-color);
-    --form-button-background-hover-color: var(--button-primary-hover-color);
+    --form-button-background-color: inherit;
+    --form-button-background-hover-color: inherit;
     --form-button-border: 2px solid transparent;
     --form-button-padding:15px 50px;
     --form-upload-color: var(--form-label-color);
@@ -57,9 +59,6 @@
     --form-card-background: var(--background-color-primary);
     --form-card-shadow: 0 1px 2px rgb(0 0 0 / 3%);
     --form-card-hover-shadow: 0 2px 4px rgb(0 0 0 / 6%);
-    --form-card-selected-border-color: var(--button-primary-color);
-    --form-card-selected-background: #F5F9FF;
-    --form-card-selected-shadow: 0 0 0 1px var(--button-primary-color);
     --form-card-transition: all 0.15s ease-in-out;
 }
 
@@ -162,10 +161,6 @@ main .form select {
     margin-top: .5rem;
     margin-bottom: 1rem;
     border-radius: 0.25rem;
-}
-
-main .form input:hover, main .form select:hover {
-    border-color: rgb(90 92 96);
 }
 
 main .form input:disabled{
@@ -353,7 +348,7 @@ main .form form fieldset.cards > .checkbox-wrapper > input:checked ~ label::afte
     display: inline-block;
     width: 8px;
     height: 8px;
-    background-color: var(--button-primary-color);
+    background-color: var(--ups-color-brand);
     border-radius: 50%;
     margin-left: auto;
 }
@@ -361,7 +356,7 @@ main .form form fieldset.cards > .checkbox-wrapper > input:checked ~ label::afte
 main .form form fieldset.cards > .radio-wrapper > input:focus ~ label,
 main .form form fieldset.cards > .checkbox-wrapper > input:focus ~ label {
     outline: none;
-    box-shadow: 0 0 0 1px var(--button-primary-color);
+    box-shadow: 0 0 0 1px var(--ups-color-brand);
 }
 
 main .form .form-image-wrapper img {
@@ -401,22 +396,8 @@ input::file-selector-button {
     text-align: center;
 }
 
-main .form button {
-    color: var(--form-button-color);
-    background: var(--form-button-background-color);
-    border: var(--form-button-border);
-    padding: var(--form-button-padding);
-    font-size: var(--form-button-font-size);
-    border-radius: unset;
-    width: 100%;
-}
-
 main form .file-wrapper > button{
     display: flex;
-}
-
-main .form button:hover {
-    background: var(--form-button-background-hover-color);
 }
 
 main .submit-wrapper{
@@ -511,30 +492,14 @@ main .file-wrapper .file-description button::after{
 }
 
 main .form .button-wrapper button {
-    cursor:pointer
-}
-
-main .form .button-wrapper button:hover {
-    border: 3px solid #fff;
-    color: #fff;
-    background-color: var(--button-secondary-color);
+    cursor: pointer;
 }
 
 main .form .button-wrapper button[disabled] {
-    cursor:auto
-}
-
-main .form .button-wrapper button[disabled]:hover {
-    border: 3px solid var(--button-secondary-color);
-    color: var(--button-secondary-color);
-    background-color: transparent;
+    cursor: auto;
 }
 
 @media (width >= 600px) {
-    main .form button {
-        width: unset;
-    }
-}
 
 main form .panel-wrapper {
   display: flex;
@@ -568,18 +533,18 @@ main .form form .repeat-wrapper{
 }
 
 main .form .form-message.success-message {
-    color: #0f5132;
-    background-color: #d1e7dd;
-    border-color: #badbcc;
+    color: var(--ups-color-success-text);
+    background-color: var(--ups-color-success-bg);
+    border-color: var(--ups-color-success-border);
     flex: 100%;
     grid-column: span 12;
     padding: 10px;
 }
 
 main .form .form-message.error-message {
-    color: #842029;
-    background-color: #f8d7da;
-    border-color: #f5c2c7;
+    color: var(--ups-color-error-text);
+    background-color: var(--ups-color-error-bg);
+    border-color: var(--ups-color-error-border);
     flex: 100%;
     grid-column: span 12;
     padding: 10px;
@@ -675,10 +640,25 @@ main div.form-wrapper {
     background: white;
     padding: 40px;
     border-radius: 12px;
-    box-shadow: 0 4px 24px rgb(0 0 0 / 8%);
 }
 
-/* Responsive adjustments for mobile */
+/*
+ * Optional responsive stacking (opt-in per form via form-level class).
+ * Add `class: stack-tablet` in form config to stack all col-* fields at <=1024px.
+ * Add `class: stack-mobile` in form config to stack all col-* fields only at <=599px.
+ */
+@media (width <= 1024px) {
+    main .form.block:not(.edit-mode) form.stack-tablet:not(.edit-mode) .field-wrapper[class*="col-"] {
+        grid-column: span 12;
+    }
+}
+
+@media (width <= 599px) {
+    main .form.block:not(.edit-mode) form.stack-mobile:not(.edit-mode) .field-wrapper[class*="col-"] {
+        grid-column: span 12;
+    }
+}
+
 @media (width <= 599px) {
     :root {
         --form-field-horz-gap: 10px;
@@ -688,4 +668,5 @@ main div.form-wrapper {
 /* Expand height for multi-select dropdowns (array types) */
 main .form form select[multiple] {
     height: calc(42px + 50px);
+}
 }

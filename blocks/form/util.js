@@ -116,12 +116,38 @@ export function createButton(fd) {
   if (fd.buttonType) {
     wrapper.classList.add(`${fd?.buttonType}-wrapper`);
   }
+  const styleObj = fd?.style;
+  const propertiesStyleObj = fd?.properties?.style;
+  
+  const buttonVariation = fd?.buttonVariation
+    ?? fd?.properties?.buttonVariation
+    ?? styleObj?.buttonVariation
+    ?? propertiesStyleObj?.buttonVariation
+    ?? 'primary';
+  
+  const buttonAlignment = fd?.buttonAlignment
+    ?? fd?.alignment
+    ?? fd?.properties?.buttonAlignment
+    ?? fd?.properties?.alignment
+    ?? styleObj?.buttonAlignment
+    ?? propertiesStyleObj?.buttonAlignment;
+
+  if (buttonAlignment) {
+    wrapper.classList.add(`button-align-${buttonAlignment}`);
+  }
+
   const button = document.createElement('button');
   button.textContent = fd?.label?.visible === false ? '' : fd?.label?.value;
   button.type = fd.buttonType || 'button';
   button.classList.add('button');
   button.id = fd.id;
   button.name = fd.name;
+  
+  // Apply button variation
+  if (buttonVariation) {
+    button.dataset.variation = buttonVariation;
+  }
+  
   if (fd?.label?.visible === false) {
     button.setAttribute('aria-label', fd?.label?.value || '');
   }
@@ -368,6 +394,126 @@ export function createRadioOrCheckboxUsingEnum(fd, wrapper) {
   });
 }
 
+function isDropdownSourceUrl(value) {
+  if (typeof value !== 'string') {
+    return false;
+  }
+  const source = value.trim();
+  if (!source) {
+    return false;
+  }
+  return /^https?:\/\//i.test(source)
+    || source.startsWith('/')
+    || source.startsWith('./')
+    || source.startsWith('../')
+    || source.includes('.json')
+    || source.includes('?sheet=');
+}
+
+function getPathValue(obj, path) {
+  if (!obj || !path || typeof path !== 'string') {
+    return undefined;
+  }
+  return path.split('.').reduce((acc, key) => acc?.[key], obj);
+}
+
+function getDropdownSourceConfig(fd) {
+  const source = fd?.optionsSource
+    ?? fd?.dataSource
+    ?? fd?.properties?.optionsSource
+    ?? fd?.properties?.dataSource;
+  if (typeof source === 'string') {
+    return {
+      url: source,
+      path: fd?.optionsSourcePath ?? fd?.properties?.optionsSourcePath,
+      labelKey: fd?.optionsSourceLabelKey ?? fd?.properties?.optionsSourceLabelKey,
+      valueKey: fd?.optionsSourceValueKey ?? fd?.properties?.optionsSourceValueKey,
+    };
+  }
+  if (source && typeof source === 'object') {
+    return source;
+  }
+  const legacySource = fd?.enum?.length === 1 ? fd?.enum?.[0] : undefined;
+  if (isDropdownSourceUrl(legacySource)) {
+    return {
+      url: legacySource,
+      path: 'data',
+      labelKey: 'Option',
+      valueKey: 'Value',
+    };
+  }
+  return null;
+}
+
+function normalizeDropdownOptions(payload, config = {}) {
+  const {
+    path,
+    labelKey = 'Option',
+    valueKey = 'Value',
+  } = config;
+
+  let list = payload;
+  if (!Array.isArray(list)) {
+    list = path ? getPathValue(payload, path) : undefined;
+  }
+  if (!Array.isArray(list)) {
+    list = payload?.data;
+  }
+  if (!Array.isArray(list)) {
+    list = payload?.options;
+  }
+  if (!Array.isArray(list)) {
+    return [];
+  }
+
+  return list
+    .map((item) => {
+      if (item == null) {
+        return null;
+      }
+      if (typeof item !== 'object') {
+        return { label: item, value: item };
+      }
+      const label = item[labelKey] ?? item.label ?? item.Label ?? item.name ?? item.value ?? item.Value;
+      const value = item[valueKey] ?? item.value ?? item.Value ?? item.id ?? item.code ?? label;
+      if (label == null || value == null) {
+        return null;
+      }
+      return { label, value };
+    })
+    .filter(Boolean);
+}
+
+function loadDropdownOptionsFromSource(fd, addOption, placeholderOption) {
+  const config = getDropdownSourceConfig(fd);
+  const url = config?.url;
+  if (!url) {
+    return;
+  }
+
+  fetch(url)
+    .then((response) => response?.json?.())
+    .then((json) => {
+      const options = normalizeDropdownOptions(json, config);
+      if (!options.length) {
+        return;
+      }
+      const selectedValues = Array.isArray(fd.value) ? fd.value.map(String) : [String(fd.value ?? '')];
+      let hasSelection = false;
+      options.forEach(({ label, value }) => {
+        const option = addOption(label, value);
+        if (selectedValues.includes(option.value)) {
+          hasSelection = true;
+        }
+      });
+      if (placeholderOption && hasSelection) {
+        placeholderOption.removeAttribute('selected');
+      }
+    })
+    .catch(() => {
+    });
+}
+
 export function createDropdownUsingEnum(fd, wrapper) {
   wrapper.innerHTML = '';
   wrapper.required = fd.required;
@@ -398,25 +544,10 @@ export function createDropdownUsingEnum(fd, wrapper) {
 
   const options = fd?.enum || [];
   const optionNames = fd?.enumNames ?? options;
+  const remoteSource = getDropdownSourceConfig(fd);
 
-  if (options.length === 1
-    && options?.[0]?.startsWith('https://')) {
-    const optionsUrl = new URL(options?.[0]);
-    // using async to avoid rendering
-    if (optionsUrl.hostname.endsWith('hlx.page')
-      || optionsUrl.hostname.endsWith('hlx.live')
-      || optionsUrl.hostname.endsWith('aem.live')
-      || optionsUrl.hostname.endsWith('aem.page')) {
-      fetch(`${optionsUrl.pathname}${optionsUrl.search}`)
-        .then(async (response) => {
-          const json = await response.json();
-          const values = [];
-          json.data.forEach((opt) => {
-            addOption(opt.Option, opt.Value);
-            values.push(opt.Value || opt.Option);
-          });
-        });
-    }
+  if (remoteSource) {
+    loadDropdownOptionsFromSource(fd, addOption, ph);
   } else if (options?.length !== optionNames.length) {
     options.forEach((value) => addOption(value, value));
   } else {
