@@ -27,6 +27,7 @@ export const createSpinner = (message) => {
 /**
  * Console utilities with colors and emojis
  */
+/* eslint-disable no-console */
 export const logger = {
   success: (message) => console.log(`✅ ${message}`),
   error: (message) => console.error(`❌ ${message}`),
@@ -34,3 +35,4 @@ export const logger = {
   info: (message) => console.log(`ℹ️ ${message}`),
   debug: (message) => console.log(`�� ${message}`),
 };
+/* eslint-enable no-console */

@@ -172,24 +172,57 @@ export default class DocBasedFormToAF {
   };
 
   /**
-   * Parses the form block DOM for config (e.g. "css: path") and sets formDef.properties.style.
+   * Parses the form block DOM for config and sets formDef.properties.
+   * Supported keys:
+   * - style: stylesheet path
+   * - id, class, css
+   * - padding, margin, border, border-radius, radius
    * Removes config rows from the block.
    * @param {HTMLElement} [block] - The form block element
+   * @param {object} [formProperties] - Optional form properties object to populate
    * @returns {string|undefined} The CSS path if found
    */
-  static parseStyleFromBlock(block) {
+  static parseStyleFromBlock(block, formProperties) {
     if (!block?.children?.length) return undefined;
     let style;
+
+    const appendCssDeclaration = (css, key, value) => {
+      const prefix = css && !css.trim().endsWith(';') ? `${css}; ` : (css || '');
+      return `${prefix}${key}: ${value};`;
+    };
+
     [...block.children].forEach((row) => {
       const text = row?.textContent?.trim() || '';
-      if (text.includes(':')) {
-        const [key, ...rest] = text.split(':');
-        if (key.trim().toLowerCase() === 'style') {
-          style = rest.join(':').trim();
-          row.remove();
-        }
+      if (!text.includes(':')) return;
+
+      const [key, ...rest] = text.split(':');
+      const normalizedKey = key.trim().toLowerCase();
+      const value = rest.join(':').trim();
+      if (!value) return;
+
+      if (normalizedKey === 'style') {
+        style = value;
+        row.remove();
+        return;
+      }
+
+      if (formProperties && (normalizedKey === 'id' || normalizedKey === 'class' || normalizedKey === 'css')) {
+        formProperties[normalizedKey] = value;
+        row.remove();
+        return;
+      }
+
+      if (formProperties && ['padding', 'margin', 'border', 'border-radius', 'radius'].includes(normalizedKey)) {
+        const cssKey = normalizedKey === 'radius' ? 'border-radius' : normalizedKey;
+        formProperties.css = appendCssDeclaration(formProperties.css, cssKey, value);
+        row.remove();
       }
     });
+
+    if (style && formProperties) {
+      formProperties.style = style;
+    }
+
     return style;
   }
 
@@ -221,11 +254,8 @@ export default class DocBasedFormToAF {
     this.errors = [];
     const applyStyleFromBlock = (def) => {
       if (block) {
-        const style = DocBasedFormToAF.parseStyleFromBlock(block);
-        if (style) {
-          def.properties = def.properties || {};
-          def.properties.style = style;
-        }
+        def.properties = def.properties || {};
+        DocBasedFormToAF.parseStyleFromBlock(block, def.properties);
       }
     };
     // if its adaptive form json just return it.

@@ -684,6 +684,25 @@
               }
             }
           }
+        },
+        {
+          "title": "Form Header",
+          "id": "form-header",
+          "plugins": {
+            "xwalk": {
+              "page": {
+                "resourceType": "core/fd/components/form/text/v1/text",
+                "template": {
+                  "jcr:title": "Form Header",
+                  "fieldType": "plain-text",
+                  "fd:viewType": "form-header",
+                  "textIsRich": true,
+                  "headerTitle": "Schedule a free consultation in 15 minutes.",
+                  "headerSubtitle": "A UPS solutions specialist will contact you shortly via email (or phone, if email is unavailable) to schedule your virtual meeting."
+                }
+              }
+            }
+          }
         }
       ]
     }

@@ -17,6 +17,7 @@
       "columns",
       "fragment",
       "form",
+      "form-header",
       "embed-adaptive-form"
     ]
   },
@@ -47,6 +48,7 @@
       "captcha",
       "checkbox",
       "checkbox-group",
+      "form-header",
       "date-input",
       "drop-down",
       "email",

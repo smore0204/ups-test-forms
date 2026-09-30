@@ -83,6 +83,36 @@
           "valueType": "string"
         },
         {
+          "component": "text",
+          "name": "optionsSource",
+          "label": "Options Source URL (API or JSON)",
+          "valueType": "string",
+          "description": "Example: /path/options.json or https://api.example.com/options"
+        },
+        {
+          "component": "text",
+          "name": "optionsSourcePath",
+          "label": "Options Data Path",
+          "valueType": "string",
+          "description": "Optional path to array in JSON, e.g. data or result.items"
+        },
+        {
+          "component": "text",
+          "name": "optionsSourceLabelKey",
+          "label": "Option Label Key",
+          "valueType": "string",
+          "value": "Option",
+          "description": "Object key used for option display text"
+        },
+        {
+          "component": "text",
+          "name": "optionsSourceValueKey",
+          "label": "Option Value Key",
+          "valueType": "string",
+          "value": "Value",
+          "description": "Object key used for option value"
+        },
+        {
           "component": "tab",
           "label": "Validation",
           "name": "validation"

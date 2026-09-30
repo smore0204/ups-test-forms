@@ -22,11 +22,14 @@ import { submitSuccess, submitFailure } from '../submit.js';
 import {
   createHelpText,
   createLabel,
+  checkValidation,
   updateOrCreateInvalidMsg,
   getCheckboxGroupValue,
   createDropdownUsingEnum,
   createRadioOrCheckboxUsingEnum,
   fetchData,
+  markValidationAttempted,
+  isValidationAttempted,
 } from '../util.js';
 import registerCustomFunctions, { preloadFunctionScripts } from './functionRegistration.js';
 import { LOG_LEVEL } from '../constant.js';
@@ -64,6 +67,24 @@ function handleActiveChild(id, form) {
   }
 }
 
+function shouldRenderValidationMessage(field) {
+  const parentForm = field?.form;
+  return field?.dataset?.userInteracted === 'true' || isValidationAttempted(parentForm);
+}
+
+function markFieldInteracted(field) {
+  if (!field || field.dataset.validationHandlersBound === 'true') {
+    return;
+  }
+  const setInteracted = () => {
+    field.dataset.userInteracted = 'true';
+    field.closest('.field-wrapper')?.setAttribute('data-user-interacted', 'true');
+  };
+  field.addEventListener('change', setInteracted);
+  field.addEventListener('blur', setInteracted);
+  field.dataset.validationHandlersBound = 'true';
+}
+
 export async function fieldChanged(payload, form, generateFormRendition) {
   const { changes, field: fieldModel } = payload;
   const {
@@ -86,12 +107,13 @@ export async function fieldChanged(payload, form, generateFormRendition) {
     return;
   }
   const fieldWrapper = field?.closest('.field-wrapper');
+  markFieldInteracted(field);
   changes.forEach((change) => {
     const { propertyName, currentValue, prevValue } = change;
     switch (propertyName) {
       case 'required':
         if (currentValue === true) {
-          fieldWrapper.dataset.required = '';
+          fieldWrapper.dataset.required = 'true';
         } else {
           fieldWrapper.removeAttribute('data-required');
         }
@@ -117,8 +139,14 @@ export async function fieldChanged(payload, form, generateFormRendition) {
           if (field.setCustomValidity) {
             if (currentValue && validity && validity.valid === false) {
               field.setCustomValidity(currentValue);
-              updateOrCreateInvalidMsg(field, currentValue);
+              if (shouldRenderValidationMessage(field)) {
+                updateOrCreateInvalidMsg(field, currentValue);
+              }
             } else if (!currentValue) {
+              // Keep current error message visible while the field is still invalid.
+              if (!field.checkValidity()) {
+                break;
+              }
               // Model says field is valid; clear DOM validation state
               // For file inputs, only clear if there's no custom validity already set
               // (file component may have set file-specific validation errors)
@@ -247,6 +275,9 @@ export async function fieldChanged(payload, form, generateFormRendition) {
         break;
       case 'valid':
         if (currentValue === true) {
+          if (!field.checkValidity()) {
+            break;
+          }
           updateOrCreateInvalidMsg(field, '');
           if (field.validity?.customError) {
             field?.setCustomValidity('');
@@ -256,7 +287,9 @@ export async function fieldChanged(payload, form, generateFormRendition) {
           const validationMessage = fieldModel.validationMessage || fieldModel.errorMessage;
           if (validationMessage) {
             field?.setCustomValidity(validationMessage);
-            updateOrCreateInvalidMsg(field, validationMessage);
+            if (shouldRenderValidationMessage(field)) {
+              updateOrCreateInvalidMsg(field, validationMessage);
+            }
           }
         }
         break;
@@ -300,7 +333,35 @@ function handleRuleEngineEvent(e, form, generateFormRendition) {
   }
 }
 
+function triggerButtonAction(element) {
+  element.dispatch({ type: 'click' });
+}
+
 function applyRuleEngine(htmlForm, form, captcha) {
+  let submitDispatchedFromClick = false;
+
+  const validateDomAndShowErrors = () => {
+    const invalidFields = Array.from(htmlForm.querySelectorAll('input,textarea,select'))
+      .filter((field) => {
+        const wrapper = field.closest('.field-wrapper');
+        return !field.disabled && wrapper?.dataset?.visible !== 'false' && !field.checkValidity();
+      });
+
+    invalidFields.forEach((field) => {
+      field.dataset.userInteracted = 'true';
+      field.closest('.field-wrapper')?.setAttribute('data-user-interacted', 'true');
+      checkValidation(field);
+    });
+
+    const firstInvalidField = invalidFields[0];
+    if (firstInvalidField) {
+      firstInvalidField.focus();
+      firstInvalidField.scrollIntoView({ behavior: 'smooth' });
+      return false;
+    }
+    return true;
+  };
+
   htmlForm.addEventListener('change', (e) => {
     const field = e.target;
     const { value, name, checked } = field;
@@ -331,16 +392,65 @@ function applyRuleEngine(htmlForm, form, captcha) {
     form.getElement(id)?.focus();
   });
 
+  htmlForm.addEventListener('focusout', (e) => {
+    const field = e.target;
+    if (field.matches('input,textarea,select')) {
+      field.dataset.userInteracted = 'true';
+      field.closest('.field-wrapper')?.setAttribute('data-user-interacted', 'true');
+      checkValidation(field);
+    }
+  });
+
   htmlForm.addEventListener('click', async (e) => {
-    if (e.target.tagName === 'BUTTON') {
-      const element = form.getElement(e.target.id);
-      if (e.target.type === 'submit' && captcha) {
+    const button = e.target.closest('button');
+    if (button && htmlForm.contains(button)) {
+      if (button.type === 'submit') {
+        markValidationAttempted(htmlForm);
+        if (!validateDomAndShowErrors()) {
+          return;
+        }
+      }
+      const element = form.getElement(button.id);
+      if (button.type === 'submit' && captcha) {
         const token = await captcha.getToken();
         form.getElement(captcha.id).value = token;
       }
       if (element) {
-        element.dispatch({ type: 'click' });
+        if (button.type === 'submit') {
+          submitDispatchedFromClick = true;
+        }
+        triggerButtonAction(element, button, htmlForm);
       }
+    }
+  });
+
+  // Keyboard submit (e.g. Enter) may not emit a click on the submit button.
+  // Bridge submit to model click so adaptive forms still submit through the rule engine.
+  htmlForm.addEventListener('submit', async (e) => {
+    markValidationAttempted(htmlForm);
+
+    if (!validateDomAndShowErrors()) {
+      return;
+    }
+
+    if (submitDispatchedFromClick) {
+      submitDispatchedFromClick = false;
+      return;
+    }
+
+    const submitter = e.submitter || htmlForm.querySelector('button[type="submit"]');
+    if (!submitter) {
+      return;
+    }
+
+    if (captcha) {
+      const token = await captcha.getToken();
+      form.getElement(captcha.id).value = token;
+    }
+
+    const submitElement = form.getElement(submitter.id);
+    if (submitElement) {
+      triggerButtonAction(submitElement, submitter, htmlForm);
     }
   });
 }
@@ -405,6 +515,7 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
         try {
           sub.callback(sub.fieldDiv, e.payload.field, 'change', e.payload);
         } catch (err) {
+          // eslint-disable-next-line no-console
           console.error(`Error in subscription callback for field "${fieldId}":`, err);
         }
       }
@@ -447,7 +558,13 @@ async function initializeRuleEngineWorker(formDef, renderHTMLForm) {
       // Wire DOM events to the model, same as the worker path does after restoreState.
       // dataset.id must be set before loadRuleEngine keys into formModels.
       response.form.dataset.id = formDef.id;
-      await loadRuleEngine(formState, response.form, response.captcha, response.generateFormRendition, data);
+      await loadRuleEngine(
+        formState,
+        response.form,
+        response.captcha,
+        response.generateFormRendition,
+        data,
+      );
     }
     return { ...response, afbForm: formModels[formDef.id] ?? afbForm };
   }

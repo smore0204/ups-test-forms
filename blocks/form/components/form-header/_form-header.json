@@ -1,0 +1,213 @@
+{
+  "definitions": [
+    {
+      "title": "Form Header",
+      "id": "form-header",
+      "plugins": {
+        "xwalk": {
+          "page": {
+            "resourceType": "core/fd/components/form/text/v1/text",
+            "template": {
+              "jcr:title": "Form Header",
+              "fieldType": "plain-text",
+              "fd:viewType": "form-header",
+              "textIsRich": true,
+              "headerTitle": "Schedule a free consultation in 15 minutes.",
+              "headerSubtitle": "A UPS solutions specialist will contact you shortly via email (or phone, if email is unavailable) to schedule your virtual meeting."
+            }
+          }
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "form-header",
+      "fields": [
+        {
+          "component": "tab",
+          "label": "Basic",
+          "name": "basic"
+        },
+        {
+          "...": "../../models/form-common/_basic-input-fields.json#/fields"
+        },
+        {
+          "component": "richtext",
+          "name": "headerTitle",
+          "label": "Header title",
+          "valueType": "string",
+          "required": true
+        },
+        {
+          "component": "richtext",
+          "name": "headerSubtitle",
+          "label": "Header subtitle",
+          "valueType": "string"
+        },
+        {
+          "component": "tab",
+          "label": "Style",
+          "name": "style"
+        },
+        {
+          "component": "select",
+          "name": "headerBackgroundColor",
+          "label": "Background color",
+          "valueType": "string",
+          "value": "#148a84",
+          "description": "Select a preset background color",
+          "options": [
+            {
+              "name": "UPS Teal",
+              "value": "#148a84"
+            },
+            {
+              "name": "UPS Teal Alt",
+              "value": "#008a8f"
+            },
+            {
+              "name": "UPS Gold",
+              "value": "#ffb500"
+            },
+            {
+              "name": "White",
+              "value": "#ffffff"
+            },
+            {
+              "name": "Light Gray",
+              "value": "#f5f7f8"
+            },
+            {
+              "name": "Dark Gray",
+              "value": "#1f2937"
+            },
+            {
+              "name": "Black",
+              "value": "#000000"
+            },
+            {
+              "name": "Transparent",
+              "value": "transparent"
+            }
+          ]
+        },
+        {
+          "component": "text",
+          "name": "headerTextColor",
+          "label": "Text color",
+          "valueType": "string",
+          "value": "#ffffff",
+          "description": "Any valid CSS color. Example: #ffffff"
+        },
+        {
+          "component": "text",
+          "name": "headerBorderColor",
+          "label": "Border color",
+          "valueType": "string",
+          "description": "Any valid CSS color. Example: #0f6f6a"
+        },
+        {
+          "component": "text",
+          "name": "headerBorderWidth",
+          "label": "Border width",
+          "valueType": "string",
+          "description": "Any valid CSS length. Example: 1px"
+        },
+        {
+          "component": "select",
+          "name": "headerBorderStyle",
+          "label": "Border style",
+          "valueType": "string",
+          "value": "solid",
+          "options": [
+            {
+              "name": "Solid",
+              "value": "solid"
+            },
+            {
+              "name": "Dashed",
+              "value": "dashed"
+            },
+            {
+              "name": "Dotted",
+              "value": "dotted"
+            },
+            {
+              "name": "None",
+              "value": "none"
+            }
+          ]
+        },
+        {
+          "component": "text",
+          "name": "headerBorderRadius",
+          "label": "Border radius",
+          "valueType": "string",
+          "value": "16px 16px 0 0",
+          "description": "Any valid CSS radius. Example: 16px 16px 0 0"
+        },
+        {
+          "component": "text",
+          "name": "headerPadding",
+          "label": "Padding",
+          "valueType": "string",
+          "value": "34px 30px",
+          "description": "Any valid CSS spacing. Example: 34px 30px"
+        },
+        {
+          "component": "select",
+          "name": "headerTextAlign",
+          "label": "Text alignment",
+          "valueType": "string",
+          "value": "center",
+          "options": [
+            {
+              "name": "Left",
+              "value": "left"
+            },
+            {
+              "name": "Center",
+              "value": "center"
+            },
+            {
+              "name": "Right",
+              "value": "right"
+            }
+          ]
+        },
+        {
+          "component": "text",
+          "name": "headerTitleFontSize",
+          "label": "Title font size",
+          "valueType": "string",
+          "description": "Any valid CSS font-size. Example: clamp(1.8rem, 2.3vw, 3rem)"
+        },
+        {
+          "component": "text",
+          "name": "headerSubtitleFontSize",
+          "label": "Subtitle font size",
+          "valueType": "string",
+          "description": "Any valid CSS font-size. Example: clamp(1rem, 1.1vw, 1.3rem)"
+        },
+        {
+          "component": "text",
+          "name": "headerTitleFontWeight",
+          "label": "Title font weight",
+          "valueType": "string",
+          "description": "Any valid CSS font-weight. Example: 800"
+        },
+        {
+          "component": "text",
+          "name": "headerSubtitleFontWeight",
+          "label": "Subtitle font weight",
+          "valueType": "string",
+          "description": "Any valid CSS font-weight. Example: 600"
+        },
+        {
+          "...": "../../models/form-common/_help-container.json#/fields"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+/* Typography tokens (root-level foundation) */
+:root {
+    --ups-font-family-form: "UPS Berlingske Sans", helvetica, arial, sans-serif;
+    --ups-font-size-label: 14px;
+    --ups-font-size-control: 14px;
+    --ups-font-size-help: 14px;
+    --ups-font-size-submit: 20px;
+    --ups-font-weight-label: 700;
+    --ups-font-weight-title: 700;
+}

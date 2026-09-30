@@ -59,6 +59,26 @@
               "name": "style",
               "label": "Form Specific styles path",
               "valueType": "string"
+            },
+            {
+              "component": "text",
+              "name": "id",
+              "label": "Form id",
+              "valueType": "string"
+            },
+            {
+              "component": "text",
+              "name": "class",
+              "label": "Form CSS classes",
+              "valueType": "string",
+              "description": "Space-separated classes. Example: stack-tablet custom-form"
+            },
+            {
+              "component": "text",
+              "name": "css",
+              "label": "Form inline CSS",
+              "valueType": "string",
+              "description": "Ex: padding:24px; margin:16px 0;"
             }
           ]
         }
@@ -78,6 +98,7 @@
         "captcha",
         "checkbox",
         "checkbox-group",
+        "form-header",
         "date-input",
         "drop-down",
         "email",

@@ -29,6 +29,62 @@
           "...": "../form-common/_basic-fields.json#/fields"
         },
         {
+          "component": "tab",
+          "label": "Style",
+          "name": "style"
+        },
+        {
+          "component": "select",
+          "name": "buttonVariation",
+          "label": "Button style",
+          "valueType": "string",
+          "value": "primary",
+          "options": [
+            {
+              "name": "Primary (UPS Brand - Teal)",
+              "value": "primary"
+            },
+            {
+              "name": "Secondary (Dark Gray)",
+              "value": "secondary"
+            },
+            {
+              "name": "Outlined (Teal Border)",
+              "value": "outlined"
+            },
+            {
+              "name": "UPS button",
+              "value": "ups"
+            }
+          ]
+        },
+        {
+          "component": "select",
+          "name": "buttonAlignment",
+          "label": "Button alignment",
+          "valueType": "string",
+          "value": "left",
+          "options": [
+            {
+              "name": "Left",
+              "value": "left"
+            },
+            {
+              "name": "Center",
+              "value": "center"
+            },
+            {
+              "name": "Right",
+              "value": "right"
+            }
+          ]
+        },
+        {
+          "component": "tab",
+          "label": "Help Content",
+          "name": "help"
+        },
+        {
           "...": "../form-common/_help-container.json#/fields"
         }
       ]

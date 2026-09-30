@@ -1,0 +1,57 @@
+.form :where(input, textarea, select):focus-visible {
+    outline: none;
+    border-color: var(--ups-color-border-strong);
+    box-shadow: var(--ups-focus-ring);
+}
+
+.form :where(.button-wrapper button, button[type='submit']):hover {
+    background: var(--ups-color-brand-hover);
+}
+
+.form .button-wrapper button[data-custom-bg='true']:hover {
+    background: var(--form-button-custom-bg);
+    filter: brightness(0.95);
+}
+
+/* Error message - hidden by default, shown as red tooltip below field */
+.form .field-invalid .field-description {
+    display: none;
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ups-color-error);
+    color: var(--ups-color-error-text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: var(--ups-font-size-help);
+    font-weight: 600;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-top: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Arrow pointing up from tooltip */
+.form .field-invalid .field-description::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid var(--ups-color-error);
+}
+
+/* Show error message when field has been focused out (blurred) and is invalid */
+.form .field-invalid[data-user-interacted='true'] .field-description {
+    display: block;
+}
+
+/* Show only the first invalid field's error message after form submission attempt */
+.form[data-validation-attempted='true'] .field-invalid:first-of-type .field-description {
+    display: block;
+}

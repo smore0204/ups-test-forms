@@ -1,4 +1,5 @@
 import { DEFAULT_THANK_YOU_MESSAGE, getSubmitBaseUrl } from './constant.js';
+import { checkValidation, markValidationAttempted } from './util.js';
 
 export function submitSuccess(e, form) {
   const { payload } = e;
@@ -58,7 +59,7 @@ function getFieldValue(fe, payload) {
   return null;
 }
 
-function constructPayload(form) {
+export function constructPayload(form) {
   const payload = { __id__: generateUnique() };
   [...form.elements].forEach((fe) => {
     if (fe.name && !fe.matches('button') && !fe.disabled && fe.tagName !== 'FIELDSET') {
@@ -70,6 +71,16 @@ function constructPayload(form) {
       }
     }
   });
+  payload.formid = '7365';
+  payload.lpId = '26183';
+  payload.subId = '24';
+  payload.munchkinId = '935-KKE-240';
+  payload.formVid = '7365';
+  payload.checksumFields = Object.keys(payload)
+    .filter((fieldName) => fieldName !== '__id__')
+    .join(',');
+  const pageUrl = window.location.href.replace(/^https?:/, '').split(/[?#]/)[0];
+  payload.lpurl = `${pageUrl}?cr={creative}&kw={keyword}`;
   return { payload };
 }
 
@@ -119,6 +130,13 @@ async function submitDocBasedForm(form, captcha) {
 
 export async function handleSubmit(e, form, captcha) {
   e.preventDefault();
+  markValidationAttempted(form);
+
+  // Adaptive forms submit through the model/rules engine path (rules/index.js).
+  // Do not run sheet-specific DOM submission logic for source=aem.
+  if (form.dataset.source !== 'sheet') {
+    return;
+  }
 
   const valid = form.checkValidity();
   if (valid) {
@@ -134,6 +152,10 @@ export async function handleSubmit(e, form, captcha) {
       }
     }
   } else {
+    form.querySelectorAll(':invalid:not(fieldset)').forEach((invalidField) => {
+      checkValidation(invalidField);
+    });
+
     const firstInvalidEl = form.querySelector(':invalid:not(fieldset)');
     if (firstInvalidEl) {
       firstInvalidEl.focus();
