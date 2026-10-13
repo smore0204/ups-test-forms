@@ -504,6 +504,32 @@ function normalizeDropdownOptions(payload, config = {}) {
     .filter(Boolean);
 }
 
+/**
+ * Resolves a dropdown source path so it also loads on AEM author.
+ * On author, site files such as spreadsheets (country-list.json) are only served through the
+ * /content/<site>.resource proxy, so /us/en/country-list.json or
+ * /content/ups/us/en/country-list.json becomes /content/ups.resource/us/en/country-list.json.
+ * Everywhere else, and for full URLs, relative paths and DAM paths, the source is unchanged.
+ * @param {string} url - The authored dropdown source
+ * @param {Location|URL} [location] - The current page location (defaults to window.location)
+ * @returns {string} The URL to fetch
+ */
+export function getDropdownSourceUrl(url, location = window.location) {
+  const isAuthor = location?.hostname?.startsWith('author-')
+    && location.hostname.endsWith('.adobeaemcloud.com');
+  if (!isAuthor || typeof url !== 'string' || !url.startsWith('/') || url.startsWith('//')
+    || url.startsWith('/content/dam/')) {
+    return url;
+  }
+  const authoredSite = url.match(/^\/content\/([^/.]+)(?:\.resource)?(?=\/)/);
+  const site = authoredSite?.[1] ?? location.pathname?.match(/^\/content\/([^/.]+)\//)?.[1];
+  if (!site) {
+    return url;
+  }
+  const sitePath = authoredSite ? url.slice(authoredSite[0].length) : url;
+  return `/content/${site}.resource${sitePath}`;
+}
+
 function loadDropdownOptionsFromSource(fd, addOption, placeholderOption) {
   const config = getDropdownSourceConfig(fd);
   const url = config?.url;
@@ -511,7 +537,7 @@ function loadDropdownOptionsFromSource(fd, addOption, placeholderOption) {
     return;
   }
 
-  fetch(url)
+  fetch(getDropdownSourceUrl(url))
     .then((response) => response?.json?.())
     .then((json) => {
       const options = normalizeDropdownOptions(json, config);
