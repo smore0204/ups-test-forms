@@ -29,6 +29,18 @@ describe('getDropdownSourceUrl', () => {
       );
     });
 
+    it('should load a site path from the UPS site on a forms page', () => {
+      const formPage = new URL('https://author-p139958-e1425834.adobeaemcloud.com/content/forms/af/vivitha/dropdownlist.html');
+      assert.strictEqual(
+        getDropdownSourceUrl('/us/en/country-list.json', formPage),
+        '/content/ups.resource/us/en/country-list.json',
+      );
+      assert.strictEqual(
+        getDropdownSourceUrl('/content/ups-pt/us/en/country-list.json', formPage),
+        '/content/ups-pt.resource/us/en/country-list.json',
+      );
+    });
+
     it('should leave a path that already uses the .resource proxy unchanged', () => {
       assert.strictEqual(
         getDropdownSourceUrl('/content/ups.resource/us/en/country-list.json', author),
