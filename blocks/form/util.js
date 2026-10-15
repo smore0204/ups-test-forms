@@ -409,6 +409,10 @@ export function createRadioOrCheckboxUsingEnum(fd, wrapper) {
   });
 }
 
+// Forms live under /content/forms on author; their dropdown data comes from this site.
+const FORMS_ROOT = 'forms';
+const DATA_SOURCE_SITE = 'ups';
+
 function isDropdownSourceUrl(value) {
   if (typeof value !== 'string') {
     return false;
@@ -509,6 +513,8 @@ function normalizeDropdownOptions(payload, config = {}) {
  * On author, site files such as spreadsheets (country-list.json) are only served through the
  * /content/<site>.resource proxy, so /us/en/country-list.json or
  * /content/ups/us/en/country-list.json becomes /content/ups.resource/us/en/country-list.json.
+ * Forms pages (/content/forms/...) are not part of a site, so they read the data from the
+ * UPS site; an authored /content/<site>/... path picks another site.
  * Everywhere else, and for full URLs, relative paths and DAM paths, the source is unchanged.
  * @param {string} url - The authored dropdown source
  * @param {Location|URL} [location] - The current page location (defaults to window.location)
@@ -522,7 +528,8 @@ export function getDropdownSourceUrl(url, location = window.location) {
     return url;
   }
   const authoredSite = url.match(/^\/content\/([^/.]+)(?:\.resource)?(?=\/)/);
-  const site = authoredSite?.[1] ?? location.pathname?.match(/^\/content\/([^/.]+)\//)?.[1];
+  const pageSite = location.pathname?.match(/^\/content\/([^/.]+)\//)?.[1];
+  const site = authoredSite?.[1] ?? (pageSite === FORMS_ROOT ? DATA_SOURCE_SITE : pageSite);
   if (!site) {
     return url;
   }
