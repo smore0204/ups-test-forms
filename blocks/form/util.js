@@ -530,6 +530,25 @@ export function getDropdownSourceUrl(url, location = window.location) {
   return `/content/${site}.resource${sitePath}`;
 }
 
+/**
+ * Loads a dropdown data source (e.g. /us/en/country-list.json) once per URL, like
+ * fetchPlaceholders: the request promise is kept in window.dropdownSources, so every dropdown
+ * using the same source (several fields, repeated panels) shares one request. A failed request
+ * resolves to {} so the dropdown just stays empty.
+ * @param {string} url The authored dropdown source
+ * @returns {Promise<object>} The source JSON
+ */
+export function fetchDropdownSource(url) {
+  const sourceUrl = getDropdownSourceUrl(url);
+  window.dropdownSources = window.dropdownSources || {};
+  if (!window.dropdownSources[sourceUrl]) {
+    window.dropdownSources[sourceUrl] = fetch(sourceUrl)
+      .then((response) => (response.ok ? response.json() : {}))
+      .catch(() => ({}));
+  }
+  return window.dropdownSources[sourceUrl];
+}
+
 function loadDropdownOptionsFromSource(fd, addOption, placeholderOption) {
   const config = getDropdownSourceConfig(fd);
   const url = config?.url;
@@ -537,8 +556,7 @@ function loadDropdownOptionsFromSource(fd, addOption, placeholderOption) {
     return;
   }
 
-  fetch(getDropdownSourceUrl(url))
-    .then((response) => response?.json?.())
+  fetchDropdownSource(url)
     .then((json) => {
       const options = normalizeDropdownOptions(json, config);
       if (!options.length) {
