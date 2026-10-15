@@ -537,6 +537,24 @@ export function getDropdownSourceUrl(url, location = window.location) {
   return `/content/${site}.resource${sitePath}`;
 }
 
+/**
+ * Dropdowns that load their options from a source (e.g. /us/en/country-list.json) still carry
+ * the authored options (Item 1 / Item 2) in the form model, so the runtime would reject every
+ * value from the source ("Please select a value from the allowed options."). The rendered
+ * select only offers the source options, so the model's option check is turned off for them.
+ * @param {object} fd The form definition, or a panel / field in it
+ */
+export function allowDropdownSourceValues(fd) {
+  if (!fd || typeof fd !== 'object') {
+    return;
+  }
+  if (fd.fieldType === 'drop-down' && getDropdownSourceConfig(fd)) {
+    fd.enforceEnum = false;
+  }
+  const children = Array.isArray(fd.items) ? fd.items : Object.values(fd[':items'] || {});
+  children.forEach(allowDropdownSourceValues);
+}
+
 function loadDropdownOptionsFromSource(fd, addOption, placeholderOption) {
   const config = getDropdownSourceConfig(fd);
   const url = config?.url;

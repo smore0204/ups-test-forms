@@ -6,6 +6,7 @@ import componentDecorator from './mappings.js';
 import { handleSubmit } from './submit.js';
 import DocBasedFormToAF from './transform.js';
 import {
+  allowDropdownSourceValues,
   checkValidation,
   createButton,
   createDropdownUsingEnum,
@@ -559,6 +560,7 @@ async function setupForm(formDef, { pathname, block, editMode = false } = {}) {
     loadFormCustomStyles(formDef);
     afModule = await import('./rules/index.js');
     addRequestContextToForm(formDef);
+    allowDropdownSourceValues(formDef);
     if (afModule && afModule.initAdaptiveForm && !editMode) {
       ({ form, afbForm } = await afModule.initAdaptiveForm(formDef, createForm));
     } else {
