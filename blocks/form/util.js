@@ -320,9 +320,16 @@ export function setConstraints(element, fd) {
   }
 }
 
+// Field types that show a placeholder (an unknown type such as "telephone" works as "text").
+const PLACEHOLDER_TYPES = ['text', 'email', 'tel', 'number', 'password', 'url', 'search', 'textarea'];
+
 export function setPlaceholder(element, fd) {
   if (fd.placeholder) {
     element.setAttribute('placeholder', fd.placeholder);
+  } else if (PLACEHOLDER_TYPES.includes(element.type)) {
+    // A blank placeholder lets the CSS tell an empty field (label inside it) from a filled one
+    // (label at the top), see the ups.com look in form.css.
+    element.setAttribute('placeholder', ' ');
   }
 }
 
