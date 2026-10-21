@@ -63,6 +63,21 @@ describe('allowDropdownSourceValues', () => {
       assert.strictEqual(formDef[':items'].panel[':items'].state.enforceEnum, false);
     });
 
+    it('should save source values as text when "Save value as" is Number', () => {
+      const formDef = getFormDef();
+      formDef.items[0].type = 'number';
+      formDef.items[1].type = 'number';
+      const multi = {
+        fieldType: 'drop-down', type: 'number[]', optionsSource: '/us/en/country-list.json',
+      };
+      formDef.items.push(multi);
+      allowDropdownSourceValues(formDef);
+      assert.strictEqual(formDef.items[0].type, 'string');
+      assert.strictEqual(multi.type, 'string[]');
+      // a dropdown with its own (authored) options keeps its type
+      assert.strictEqual(formDef.items[1].type, 'number');
+    });
+
     it('should ignore empty definitions', () => {
       assert.doesNotThrow(() => allowDropdownSourceValues(undefined));
       assert.doesNotThrow(() => allowDropdownSourceValues(null));
