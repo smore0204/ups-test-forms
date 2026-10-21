@@ -541,7 +541,8 @@ export function getDropdownSourceUrl(url, location = window.location) {
  * Dropdowns that load their options from a source (e.g. /us/en/country-list.json) still carry
  * the authored options (Item 1 / Item 2) in the form model, so the runtime would reject every
  * value from the source ("Please select a value from the allowed options."). The rendered
- * select only offers the source options, so the model's option check is turned off for them.
+ * select only offers the source options, so the model's option check is turned off for them,
+ * and their values are saved as text even when "Save value as" is Number.
  * @param {object} fd The form definition, or a panel / field in it
  */
 export function allowDropdownSourceValues(fd) {
@@ -550,6 +551,10 @@ export function allowDropdownSourceValues(fd) {
   }
   if (fd.fieldType === 'drop-down' && getDropdownSourceConfig(fd)) {
     fd.enforceEnum = false;
+    // "Save value as" defaults to Number, but list values are codes (CA, US) that the form
+    // rejects on submit ("Please enter a valid value."), so they are saved as text.
+    if (fd.type === 'number') fd.type = 'string';
+    if (fd.type === 'number[]') fd.type = 'string[]';
   }
   const children = Array.isArray(fd.items) ? fd.items : Object.values(fd[':items'] || {});
   children.forEach(allowDropdownSourceValues);
