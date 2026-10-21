@@ -560,7 +560,7 @@ export function allowDropdownSourceValues(fd) {
   children.forEach(allowDropdownSourceValues);
 }
 
-function loadDropdownOptionsFromSource(fd, addOption, placeholderOption) {
+function loadDropdownOptionsFromSource(fd, addOption, placeholderOption, select) {
   const config = getDropdownSourceConfig(fd);
   const url = config?.url;
   if (!url) {
@@ -584,6 +584,11 @@ function loadDropdownOptionsFromSource(fd, addOption, placeholderOption) {
       });
       if (placeholderOption && hasSelection) {
         placeholderOption.removeAttribute('selected');
+      }
+      // No placeholder and no default value: the browser shows the first option, so send it
+      // with the form too (as if it was picked). See also syncShownSourceOptions (rules).
+      if (!placeholderOption && !hasSelection && select?.value && !select.multiple) {
+        select.dispatchEvent(new Event('change', { bubbles: true }));
       }
     })
     .catch(() => {
@@ -623,7 +628,8 @@ export function createDropdownUsingEnum(fd, wrapper) {
   const remoteSource = getDropdownSourceConfig(fd);
 
   if (remoteSource) {
-    loadDropdownOptionsFromSource(fd, addOption, ph);
+    wrapper.dataset.optionsSource = 'true';
+    loadDropdownOptionsFromSource(fd, addOption, ph, wrapper);
   } else if (options?.length !== optionNames.length) {
     options.forEach((value) => addOption(value, value));
   } else {

@@ -337,6 +337,23 @@ function triggerButtonAction(element) {
   element.dispatch({ type: 'click' });
 }
 
+/**
+ * Dropdowns that load their options from a list and have no placeholder or default value show
+ * their first option. When the list loaded before the rule engine started, nobody told the model,
+ * so the shown option would not be submitted: put it in the model now.
+ * @param {HTMLFormElement} htmlForm
+ * @param {object} form The form model
+ */
+function syncShownSourceOptions(htmlForm, form) {
+  htmlForm.querySelectorAll('select[data-options-source]').forEach((select) => {
+    const id = select.closest('.field-wrapper')?.dataset.id;
+    const field = id ? form.getElement(id) : null;
+    if (field && select.value && !select.multiple && (field.value == null || field.value === '')) {
+      field.value = select.value;
+    }
+  });
+}
+
 function applyRuleEngine(htmlForm, form, captcha) {
   let submitDispatchedFromClick = false;
 
@@ -534,6 +551,7 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
     handleRuleEngineEvent(e, htmlForm);
   }, 'submitError');
   applyRuleEngine(htmlForm, form, captcha);
+  syncShownSourceOptions(htmlForm, form);
   if (subscriptions) {
     subscriptions.forEach((subscription, id) => {
       const { callback, fieldDiv } = subscription;
